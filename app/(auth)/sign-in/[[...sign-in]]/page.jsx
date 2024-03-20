@@ -1,7 +1,8 @@
 import React from "react";
+import { SignIn } from "@clerk/nextjs";
 
 const SignIn = () => {
-  return <div>SignIn</div>;
+  return <SignIn />;
 };
 
 export default SignIn;
