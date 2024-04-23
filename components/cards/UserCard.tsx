@@ -1,8 +1,8 @@
-import { getTopIntractedTags } from "@/lib/actions/tag.action";
-import Image from "next/image";
-import Link from "next/link";
-import { Badge } from "../ui/badge";
-import RenderTag from "../shared/RenderTag";
+import { getTopInteractedTags } from '@/lib/actions/tag.action';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Badge } from '../ui/badge';
+import RenderTag from '../shared/RenderTag';
 
 interface Props {
   user: {
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const UserCard = async ({ user }: Props) => {
-  const intractedTags = await getTopIntractedTags({ userId: user._id });
+  const intractedTags = await getTopInteractedTags({ userId: user._id });
   return (
     <Link
       href={`/profile/${user.clerkId}`}
