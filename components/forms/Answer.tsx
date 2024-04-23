@@ -1,22 +1,22 @@
-"use client";
-import { useForm } from "react-hook-form";
+'use client';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "../ui/form";
-import { z } from "zod";
-import { AnswerSchema } from "@/lib/validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Editor } from "@tinymce/tinymce-react";
-import { useRef, useState } from "react";
-import { useTheme } from "@/context/ThemeProvider";
-import { Button } from "../ui/button";
-import Image from "next/image";
-import { createAnswer } from "@/lib/actions/answer.action";
-import { usePathname } from "next/navigation";
+} from '../ui/form';
+import { z } from 'zod';
+import { AnswerSchema } from '@/lib/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Editor } from '@tinymce/tinymce-react';
+import { useRef, useState } from 'react';
+import { useTheme } from '@/context/ThemeProvider';
+import { Button } from '../ui/button';
+import Image from 'next/image';
+import { createAnswer } from '@/lib/actions/answer.action';
+import { usePathname } from 'next/navigation';
 
 interface Props {
   question: string;
@@ -34,7 +34,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
     defaultValues: {
-      answer: "",
+      answer: '',
     },
   });
 
@@ -51,7 +51,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       form.reset();
       if (editorRef.current) {
         const editor = editorRef.current as any;
-        editor.setContent("");
+        editor.setContent('');
       }
     } catch (error) {
       console.log(error);
@@ -68,14 +68,14 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       const responese = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
         {
-          method: "POST",
+          method: 'POST',
           body: JSON.stringify({ question }),
         }
       );
       const aiAnswer = await responese.json();
       console.log(aiAnswer.reply);
       // Convert plain text to HTML format
-      const formattedAnswert = aiAnswer.reply.replace(/\n/g, "<br />");
+      const formattedAnswert = aiAnswer.reply.replace(/\n/g, '<br />');
 
       if (editorRef.current) {
         const editor = editorRef.current as any;
@@ -138,30 +138,30 @@ const Answer = ({ question, questionId, authorId }: Props) => {
                       menubar: false,
 
                       plugins: [
-                        "advlist",
-                        "autolink",
-                        "lists",
-                        "link",
-                        "image",
-                        "charmap",
-                        "preview",
-                        "anchor",
-                        "searchreplace",
-                        "visualblocks",
-                        "codesample",
-                        "fullscreen",
-                        "insertdatetime",
-                        "media",
-                        "table",
+                        'advlist',
+                        'autolink',
+                        'lists',
+                        'link',
+                        'image',
+                        'charmap',
+                        'preview',
+                        'anchor',
+                        'searchreplace',
+                        'visualblocks',
+                        'codesample',
+                        'fullscreen',
+                        'insertdatetime',
+                        'media',
+                        'table',
                       ],
                       toolbar:
-                        "undo redo |  " +
-                        "codesample | bold italic forecolor | alignleft aligncenter " +
-                        "alignright alignjustify | bullist numlist",
+                        'undo redo |  ' +
+                        'codesample | bold italic forecolor | alignleft aligncenter ' +
+                        'alignright alignjustify | bullist numlist',
                       content_style:
-                        "body { font-family:Inter; font-size:16px }",
-                      skin: mode === "dark" ? "oxide-dark" : "oxide",
-                      content_css: mode === "dark" ? "dark" : "light",
+                        'body { font-family:Inter; font-size:16px }',
+                      skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
+                      content_css: mode === 'dark' ? 'dark' : 'light',
                     }}
                   />
                 </FormControl>
@@ -175,7 +175,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
               className="primary-gradient w-fit text-white"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
           </div>
         </form>

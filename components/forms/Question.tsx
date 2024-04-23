@@ -1,10 +1,10 @@
-"use client";
-import React, { useRef, useState } from "react";
-import { Editor } from "@tinymce/tinymce-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+'use client';
+import React, { useRef, useState } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -13,14 +13,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { QuestionSchema } from "@/lib/validation";
-import { Badge } from "../ui/badge";
-import Image from "next/image";
-import { createQuestion, editQuestion } from "@/lib/actions/question.action";
-import { useRouter, usePathname } from "next/navigation";
-import { useTheme } from "@/context/ThemeProvider";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { QuestionSchema } from '@/lib/validation';
+import { Badge } from '../ui/badge';
+import Image from 'next/image';
+import { createQuestion, editQuestion } from '@/lib/actions/question.action';
+import { useRouter, usePathname } from 'next/navigation';
+import { useTheme } from '@/context/ThemeProvider';
 
 interface Props {
   type?: string;
@@ -36,14 +36,14 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const pathname = usePathname();
 
   const parsedQuestionDetailed =
-    questionDetails && JSON.parse(questionDetails || "");
-  const groupedTags = parsedQuestionDetailed?.tags.map((tag) => tag.name);
+    questionDetails && JSON.parse(questionDetails || '');
+  const groupedTags = parsedQuestionDetailed?.tags.map((tag: any) => tag.name);
 
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
-      title: parsedQuestionDetailed?.title || "",
-      explanation: parsedQuestionDetailed?.content || "",
+      title: parsedQuestionDetailed?.title || '',
+      explanation: parsedQuestionDetailed?.content || '',
       tags: groupedTags || [],
     },
   });
@@ -51,7 +51,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   async function onSubmit(values: z.infer<typeof QuestionSchema>) {
     setIsSubmitting(true);
     try {
-      if (type === "Edit") {
+      if (type === 'Edit') {
         //make an asyn call to our API -> edit a question
         await editQuestion({
           questionId: parsedQuestionDetailed._id,
@@ -70,7 +70,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
           path: pathname,
         });
 
-        router.push("/");
+        router.push('/');
       }
     } catch (error) {
     } finally {
@@ -82,22 +82,22 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
     e: React.KeyboardEvent<HTMLInputElement>,
     field: any
   ) => {
-    if (e.key === "Enter" && field.name === "tags") {
+    if (e.key === 'Enter' && field.name === 'tags') {
       e.preventDefault();
       const tagInput = e.target as HTMLInputElement;
       const tagValue = tagInput.value.trim();
 
-      if (tagValue !== "") {
+      if (tagValue !== '') {
         if (tagValue.length > 15) {
-          return form.setError("tags", {
-            type: "required",
-            message: "Tag must be less than 15 character.",
+          return form.setError('tags', {
+            type: 'required',
+            message: 'Tag must be less than 15 character.',
           });
         }
         if (!field.value.includes(tagValue as never)) {
-          form.setValue("tags", [...field.value, tagValue]);
-          tagInput.value = "";
-          form.clearErrors("tags");
+          form.setValue('tags', [...field.value, tagValue]);
+          tagInput.value = '';
+          form.clearErrors('tags');
         }
       } else {
         form.trigger();
@@ -107,7 +107,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
 
   const handleTagRemove = (tag: string, field: any) => {
     const newTags = field.value.filter((t: string) => t !== tag);
-    form.setValue("tags", newTags);
+    form.setValue('tags', newTags);
   };
 
   return (
@@ -153,7 +153,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
                     //@ts-ignore
                     editorRef.current = editor;
                   }}
-                  initialValue={parsedQuestionDetailed?.content || ""}
+                  initialValue={parsedQuestionDetailed?.content || ''}
                   onBlur={field.onBlur}
                   onEditorChange={(connect) => field.onChange(connect)}
                   init={{
@@ -161,29 +161,29 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
                     menubar: false,
 
                     plugins: [
-                      "advlist",
-                      "autolink",
-                      "lists",
-                      "link",
-                      "image",
-                      "charmap",
-                      "preview",
-                      "anchor",
-                      "searchreplace",
-                      "visualblocks",
-                      "codesample",
-                      "fullscreen",
-                      "insertdatetime",
-                      "media",
-                      "table",
+                      'advlist',
+                      'autolink',
+                      'lists',
+                      'link',
+                      'image',
+                      'charmap',
+                      'preview',
+                      'anchor',
+                      'searchreplace',
+                      'visualblocks',
+                      'codesample',
+                      'fullscreen',
+                      'insertdatetime',
+                      'media',
+                      'table',
                     ],
                     toolbar:
-                      "undo redo |  " +
-                      "codesample | bold italic forecolor | alignleft aligncenter " +
-                      "alignright alignjustify | bullist numlist",
-                    content_style: "body { font-family:Inter; font-size:16px }",
-                    skin: mode === "dark" ? "oxide-dark" : "oxide",
-                    content_css: mode === "dark" ? "dark" : "light",
+                      'undo redo |  ' +
+                      'codesample | bold italic forecolor | alignleft aligncenter ' +
+                      'alignright alignjustify | bullist numlist',
+                    content_style: 'body { font-family:Inter; font-size:16px }',
+                    skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: mode === 'dark' ? 'dark' : 'light',
                   }}
                 />
               </FormControl>
@@ -205,7 +205,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
               <FormControl className="mt-3.5">
                 <>
                   <Input
-                    disabled={type === "Edit"}
+                    disabled={type === 'Edit'}
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 border min-h-[56px]"
                     placeholder="Add tags..."
                     onKeyDown={(e) => handleInputKeyDown(e, field)}
@@ -219,13 +219,13 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
                           flex items-center justify-center gap-3 rounded-md border-none px-4 py-2 capitalize
                         "
                           onClick={() =>
-                            type !== "Edit"
+                            type !== 'Edit'
                               ? handleTagRemove(tag, field)
                               : () => {}
                           }
                         >
                           {tag}
-                          {type !== "Edit" && (
+                          {type !== 'Edit' && (
                             <Image
                               src="/assets/icons/close.svg"
                               alt="close icon"
@@ -254,9 +254,9 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <>{type === "Edit" ? "Editing..." : "Posting..."}</>
+            <>{type === 'Edit' ? 'Editing...' : 'Posting...'}</>
           ) : (
-            <>{type === "Edit" ? "Edit Question" : "Ask a Question"}</>
+            <>{type === 'Edit' ? 'Edit Question' : 'Ask a Question'}</>
           )}
         </Button>
       </form>
