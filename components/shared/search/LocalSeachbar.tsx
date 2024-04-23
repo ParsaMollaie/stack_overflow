@@ -1,6 +1,9 @@
-"use client";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
+'use client';
+import { Input } from '@/components/ui/input';
+import { formUrlQuery, removeKeyFromQuery } from '@/lib/utils';
+import Image from 'next/image';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface CustomInputProps {
   route: string;
@@ -17,11 +20,40 @@ const LocalSeachbar = ({
   placeholder,
   otherClasses,
 }: CustomInputProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const query = searchParams.get('q');
+  const [search, setSearch] = useState(query || '');
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (search) {
+        const newUrl = formUrlQuery({
+          params: searchParams.toString(),
+          key: 'q',
+          value: search,
+        });
+        router.push(newUrl, { scroll: false });
+      } else {
+        if (pathname === route) {
+          const newUrl = removeKeyFromQuery({
+            params: searchParams.toString(),
+            keysToRemove: ['q'],
+          });
+          router.push(newUrl, { scroll: false });
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [search, route, pathname, searchParams, router, query]);
   return (
     <div
       className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}
     >
-      {iconPosition === "left" && (
+      {iconPosition === 'left' && (
         <Image
           src={imgSrc}
           alt="search icon"
@@ -34,12 +66,12 @@ const LocalSeachbar = ({
       <Input
         type="text"
         placeholder={placeholder}
-        value=""
-        onChange={() => {}}
-        className="paragraph-regular no-focus placeholder background-light800_darkgradient border-none shadow-none outline-none"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="paragraph-regular no-focus placeholder text-dark400_light700 bg-transparent border-none shadow-none outline-none"
       />
 
-      {iconPosition === "right" && (
+      {iconPosition === 'right' && (
         <Image
           src={imgSrc}
           alt="search icon"

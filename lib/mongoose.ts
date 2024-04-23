@@ -10,7 +10,8 @@ export const connectToDatabse = async() => {
     }
 
     if(isConnected){
-        return console.log("Mongodb is alredy connected")
+        return;
+        // console.log("Mongodb is alredy connected")
     }
 
     try {

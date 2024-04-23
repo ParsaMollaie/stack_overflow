@@ -31,7 +31,8 @@ font-family: "Inter", sans-serif;
 @apply bg-light-700 dark:bg-dark-300 !important;
 }
 .markdown {
-@apply max-w-full prose dark:prose-p:text-light-700 dark:pros
+@apply max-w-full dark:text-light-700
+
 }
 .primary-gradient {
 background: linear-gradient(129deg, #ff7000 0%, #e2995f 100%)
@@ -44,9 +45,9 @@ rgba(19, 22, 28, 0.7) 100%
 );
 }
 .tab {
-@apply min-h-full dark:bg-dark-400 bg-light-800 text-light-5
+    @apply min-h-full dark:bg-dark-400 bg-light-800 text-light-500 focus-within:text-primary-500 focus-within:bg-primary-100; 
 }
-}
+
 .no-focus {
     @apply focus-visible:ring-0 focus-visible:ring-transparent !important
 }
@@ -129,4 +130,5 @@ display: none;
 .no-scrollbar {
 -ms-overflow-style: none; /* IE and Edge */
 scrollbar-width: none; /* Firefox */
+}
 }
