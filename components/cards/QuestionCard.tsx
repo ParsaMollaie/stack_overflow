@@ -9,18 +9,18 @@ interface QuestionProps {
   _id: string;
   title: string;
   tags: {
-    _id: number;
+    _id: string;
     name: string;
   }[];
   author: {
     _id: string;
-    clerkId: string;
     name: string;
     picture: string;
+    clerkId: string;
   };
   upvotes: string[];
   views: number;
-  answer: Array<Object>;
+  answers: Array<object>;
   createdAt: Date;
   clerkId?: string | null;
 }
@@ -33,7 +33,7 @@ const QuestionCard = ({
   author,
   upvotes,
   views,
-  answer,
+  answers,
   createdAt,
 }: QuestionProps) => {
   const showActionButtons = clerkId && clerkId === author.clerkId;
@@ -89,7 +89,7 @@ const QuestionCard = ({
           <Metric
             imgUrl="/assets/icons/message.svg"
             alt="message"
-            value={formatAndDivideNumber(answer ? answer.length : 0)}
+            value={formatAndDivideNumber(answers ? answers.length : 0)}
             title=" Answer"
             textStyle="small-medium text-dark400_light800"
           />

@@ -1,13 +1,13 @@
-import QuestionCard from "@/components/cards/QuestionCard";
-import Filter from "@/components/shared/Filter";
-import NoResult from "@/components/shared/NoResult";
-import Pagination from "@/components/shared/Pagination";
-import LocalSeachbar from "@/components/shared/search/LocalSeachbar";
-import { QuestionFilters } from "@/constants/filters";
-import { IQuestion } from "@/database/question.model";
-import { getSavedQuestion } from "@/lib/actions/user.action";
-import { SearchParamsProps } from "@/types";
-import { auth } from "@clerk/nextjs";
+import QuestionCard from '@/components/cards/QuestionCard';
+import Filter from '@/components/shared/Filter';
+import NoResult from '@/components/shared/NoResult';
+import Pagination from '@/components/shared/Pagination';
+import LocalSeachbar from '@/components/shared/search/LocalSeachbar';
+import { QuestionFilters } from '@/constants/filters';
+import { IQuestion } from '@/database/question.model';
+import { getSavedQuestion } from '@/lib/actions/user.action';
+import { SearchParamsProps } from '@/types';
+import { auth } from '@clerk/nextjs';
 
 export default async function Page({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
@@ -19,6 +19,7 @@ export default async function Page({ searchParams }: SearchParamsProps) {
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
   });
+  console.log(result);
 
   return (
     <>
@@ -49,7 +50,7 @@ export default async function Page({ searchParams }: SearchParamsProps) {
               author={question.author}
               upvotes={question.upvotes}
               views={question.views}
-              answer={question.answers}
+              answers={question.answers}
               createdAt={question.createdAt}
             />
           ))
