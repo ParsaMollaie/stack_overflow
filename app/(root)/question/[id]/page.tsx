@@ -1,16 +1,16 @@
-import Answer from "@/components/forms/Answer";
-import AllAnswers from "@/components/shared/AllAnswers";
-import Metric from "@/components/shared/Metric";
-import ParseHTML from "@/components/shared/ParseHTML";
-import RenderTag from "@/components/shared/RenderTag";
-import Votes from "@/components/shared/Votes";
-import { getQuestionById } from "@/lib/actions/question.action";
-import { getUserById } from "@/lib/actions/user.action";
-import { formatAndDivideNumber } from "@/lib/utils";
-import { URLProps } from "@/types";
-import { auth } from "@clerk/nextjs";
-import Image from "next/image";
-import Link from "next/link";
+import Answer from '@/components/forms/Answer';
+import AllAnswers from '@/components/shared/AllAnswers';
+import Metric from '@/components/shared/Metric';
+import ParseHTML from '@/components/shared/ParseHTML';
+import RenderTag from '@/components/shared/RenderTag';
+import Votes from '@/components/shared/Votes';
+import { getQuestionById } from '@/lib/actions/question.action';
+import { getUserById } from '@/lib/actions/user.action';
+import { formatAndDivideNumber } from '@/lib/utils';
+import { URLProps } from '@/types';
+import { auth } from '@clerk/nextjs';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
@@ -22,8 +22,8 @@ const Page = async ({ params, searchParams }: URLProps) => {
 
   const result = await getQuestionById({ questionId: params.id });
 
-  const dayjs = require("dayjs");
-  var relativeTime = require("dayjs/plugin/relativeTime");
+  const dayjs = require('dayjs');
+  var relativeTime = require('dayjs/plugin/relativeTime');
   dayjs.extend(relativeTime);
 
   return (
@@ -105,7 +105,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
         questionId={result._id}
         userId={mongoUser._id}
         totalAnswer={result.answers.length}
-        page={searchParams?.page}
+        page={searchParams?.page ? +searchParams.page : 1}
         filter={searchParams?.filter}
       />
 
