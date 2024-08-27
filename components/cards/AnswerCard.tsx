@@ -1,8 +1,8 @@
-import Link from "next/link";
-import Metric from "../shared/Metric";
-import { formatAndDivideNumber } from "@/lib/utils";
-import { SignedIn } from "@clerk/nextjs";
-import EditDeleteAction from "../shared/EditDeleteAction";
+import Link from 'next/link';
+import Metric from '../shared/Metric';
+import { formatAndDivideNumber } from '@/lib/utils';
+import { SignedIn } from '@clerk/nextjs';
+import EditDeleteAction from '../shared/EditDeleteAction';
 
 interface AnswerProps {
   _id: string;
@@ -30,8 +30,8 @@ const AnswerCard = ({
   question,
 }: AnswerProps) => {
   const showActionButtons = clerkId && clerkId === author.clerkId;
-  const dayjs = require("dayjs");
-  var relativeTime = require("dayjs/plugin/relativeTime");
+  const dayjs = require('dayjs');
+  var relativeTime = require('dayjs/plugin/relativeTime');
   dayjs.extend(relativeTime);
   return (
     <Link
@@ -60,7 +60,7 @@ const AnswerCard = ({
           imgUrl={author.picture}
           alt="user"
           value={author.name}
-          title={`-asked ${dayjs(createdAt).fromNow()}`}
+          title={`-answered ${dayjs(createdAt).fromNow()}`}
           href={`/profile/${author.clerkId}`}
           isAuthor
           textStyle="body-medium text-dark400_light700"

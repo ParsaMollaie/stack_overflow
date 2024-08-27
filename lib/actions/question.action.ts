@@ -64,6 +64,24 @@ export async function getQuestions(params:GetQuestionsParams) {
     
 }
 
+export async function getAllQuestions() {
+    try {
+        connectToDatabse();
+
+        const questions = await Question.find({})
+            .populate({ path: 'tags', model: Tag, select:'_id name' })
+            .populate({ path: 'author', model: User, select:'_id clerkId name picture' });
+
+
+  
+      return questions;
+    } catch (error) {
+        console.log(error);
+        throw error;
+        
+    }
+}
+
 export async function createQuestion(params:CreateQuestionParams) {
     try {
         connectToDatabse();

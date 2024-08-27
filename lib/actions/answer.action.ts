@@ -2,7 +2,7 @@
 
 import Answer from "@/database/answer.model";
 import { connectToDatabse } from "../mongoose";
-import { AnswerVoteParams, CreateAnswerParams, DeleteAnswerParams, GetAnswersParams } from "./shared.types";
+import { AnswerVoteParams, CreateAnswerParams, DeleteAnswerParams, GetAnswersParams, GetSingleAnswersParams } from "./shared.types";
 import Question from "@/database/question.model";
 import { revalidatePath } from "next/cache";
 import Interaction from "@/database/interaction.model";
@@ -190,4 +190,25 @@ export async function deleteAnswer(params:DeleteAnswerParams) {
         console.log(error);
         throw error; 
     } 
+}
+
+export async function getSingleAnswer(params:GetSingleAnswersParams) {
+    try {
+        connectToDatabse(); 
+        const {questionId} = params;
+
+        // Find the first answer that matches the given questionId
+        const answer = await Answer.findOne({ question: questionId })
+            .populate("author", "_id clerkId name picture");
+
+        if (!answer) {
+            throw new Error("Answer not found");
+        }
+
+        return answer;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }

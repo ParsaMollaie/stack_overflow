@@ -14,6 +14,11 @@ export const sidebarLinks: SidebarLink[] = [
     label: "Home",
     },
     {
+    imgURL: "/assets/icons/question.svg",
+    route: "/all-questions",
+    label: "All questions",
+    },
+    {
     imgURL: "/assets/icons/users.svg",
     route: "/community",
     label: "Community",
@@ -22,11 +27,6 @@ export const sidebarLinks: SidebarLink[] = [
     imgURL: "/assets/icons/star.svg",
     route: "/collection",
     label: "Collections",
-    },
-    {
-    imgURL: "/assets/icons/suitcase.svg",
-    route: "/jobs",
-    label: "Find Jobs",
     },
     {
     imgURL: "/assets/icons/tag.svg",
@@ -43,6 +43,7 @@ export const sidebarLinks: SidebarLink[] = [
     route: "/ask-question",
     label: "Ask a question",
     },
+    
 ];
 
 export const BADGE_CRITERIA = {

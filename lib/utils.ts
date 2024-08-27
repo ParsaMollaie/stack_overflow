@@ -94,4 +94,29 @@ export const assignBadges = (params: BadgeParam) => {
 
 }
 
+export const cosineSimilarity = (text1: string, text2: string): number =>{
+  const vector1 = textToVector(text1);
+  const vector2 = textToVector(text2);
+
+  const dotProduct = vector1.reduce((sum, _, i) => sum + vector1[i] * vector2[i], 0);
+  const magnitude1 = Math.sqrt(vector1.reduce((sum, val) => sum + val * val, 0));
+  const magnitude2 = Math.sqrt(vector2.reduce((sum, val) => sum + val * val, 0));
+
+  if (magnitude1 && magnitude2) {
+    return dotProduct / (magnitude1 * magnitude2);
+  } else {
+    return 0;
+  }
+}
+
+function textToVector(text: string): number[] {
+  const words = text.toLowerCase().split(/\W+/);
+  const wordCounts = words.reduce((map, word) => {
+    map[word] = (map[word] || 0) + 1;
+    return map;
+  }, {} as Record<string, number>);
+
+  return Object.values(wordCounts);
+}
+
 

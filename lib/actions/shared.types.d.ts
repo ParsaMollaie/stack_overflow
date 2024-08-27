@@ -12,6 +12,10 @@ sortBy?: string;
 page?: number;
 pageSize?: number;
 }
+export interface GetSingleAnswersParams {
+    questionId: string;
+    
+}
 export interface AnswerVoteParams {
 answerId: string;
 userId: string;
