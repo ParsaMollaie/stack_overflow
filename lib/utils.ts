@@ -109,6 +109,14 @@ export const cosineSimilarity = (text1: string, text2: string): number =>{
   }
 }
 
+export const removeStopWords = (text: string): string => {
+  const stopWords = new Set(['the', 'is', 'at', 'which', 'and', 'on', 'in', 'a', 'of', 'to', 'with']);
+  return text
+    .split(' ')
+    .filter(word => !stopWords.has(word))
+    .join(' ');
+};
+
 function textToVector(text: string): number[] {
   const words = text.toLowerCase().split(/\W+/);
   const wordCounts = words.reduce((map, word) => {

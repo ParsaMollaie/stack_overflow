@@ -8,17 +8,22 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import ReactHtmlParser from 'html-react-parser';
 
 interface AlertDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (correctedContent: string) => void;
+  onSubmit: (correctedContent: { title: string; content: string }) => void;
   originalContent: {
     title: string;
     explanation: string;
     tags: string[];
   } | null;
-  correctedContent: string | null;
+  correctedContent: { title: string; content: string } | null;
+  changes: {
+    title: string[];
+    explanation: string[];
+  } | null;
 }
 
 const GrammarDialog: React.FC<AlertDialogProps> = ({
@@ -27,10 +32,29 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
   onSubmit,
   originalContent,
   correctedContent,
+  changes,
 }) => {
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
+  const highlightChanges = (text: string, wordsToHighlight: string[]) => {
+    let highlightedText = text;
+    wordsToHighlight.forEach((word) => {
+      const escapedWord = escapeRegExp(word);
+      const regex = new RegExp(`(${escapedWord})`, 'gi');
+      highlightedText = highlightedText.replace(
+        regex,
+        '<span class="underline-error">$1</span>'
+      );
+    });
+    // Ensure ReactHtmlParser processes the HTML string safely
+    return ReactHtmlParser(highlightedText);
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent className="crad-wrapper">
+      <AlertDialogContent className="card-wrapper">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-dark200_light900">
             AI Suggested Corrections
@@ -41,13 +65,27 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="mt-4">
-          <h4 className="text-dark200_light900">Original Content:</h4>
+          <h4 className="text-dark200_light900">Original Title:</h4>
           <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
-            {originalContent?.explanation}
+            {highlightChanges(
+              originalContent?.title || '',
+              changes?.title || []
+            )}
+          </pre>
+          <h4 className="mt-4 text-dark200_light900">Corrected Title:</h4>
+          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
+            {ReactHtmlParser(correctedContent?.title || '')}
+          </pre>
+          <h4 className="mt-4 text-dark200_light900">Original Content:</h4>
+          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
+            {highlightChanges(
+              originalContent?.explanation || '',
+              changes?.explanation || []
+            )}
           </pre>
           <h4 className="mt-4 text-dark200_light900">Corrected Content:</h4>
           <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
-            {correctedContent}
+            {ReactHtmlParser(correctedContent?.content || '')}
           </pre>
         </div>
         <AlertDialogFooter>

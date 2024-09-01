@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { createAnswer } from '@/lib/actions/answer.action';
 import { usePathname } from 'next/navigation';
 import { toast } from '../ui/use-toast';
+import CheckRelevanceDialog from '../shared/CheckRelevanceDialog';
 
 interface Props {
   question: string;
@@ -29,6 +30,11 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   const { mode } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittingAI, setIsSubmittingAI] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState<z.infer<
+    typeof AnswerSchema
+  > | null>(null);
+
   const pathname = usePathname();
 
   const editorRef = useRef(null);
@@ -41,9 +47,27 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 
   const handleSubmitAnswer = async (values: z.infer<typeof AnswerSchema>) => {
     setIsSubmitting(true);
+
     try {
+      const answer = values.answer;
+      const checkRelevanceResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/checkRelevance`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ question, answer }),
+        }
+      );
+
+      const relevanceResult = await checkRelevanceResponse.json();
+
+      if (!relevanceResult.relevant) {
+        setPendingSubmission(values);
+        setIsDialogOpen(true);
+        return;
+      }
+
       await createAnswer({
-        content: values.answer,
+        content: answer,
         author: JSON.parse(authorId),
         question: JSON.parse(questionId),
         path: pathname,
@@ -60,6 +84,52 @@ const Answer = ({ question, questionId, authorId }: Props) => {
       setIsSubmitting(false);
     }
   };
+
+  const handleDialogCancel = () => {
+    setIsDialogOpen(false);
+    setPendingSubmission(null);
+  };
+
+  const handleDialogContinue = async () => {
+    if (pendingSubmission) {
+      await createAnswer({
+        content: pendingSubmission.answer,
+        author: JSON.parse(authorId),
+        question: JSON.parse(questionId),
+        path: pathname,
+      });
+
+      form.reset();
+      if (editorRef.current) {
+        const editor = editorRef.current as any;
+        editor.setContent('');
+      }
+    }
+    setIsDialogOpen(false);
+    setPendingSubmission(null);
+  };
+
+  // const handleSubmitAnswer = async (values: z.infer<typeof AnswerSchema>) => {
+  //   setIsSubmitting(true);
+  //   try {
+  //     await createAnswer({
+  //       content: values.answer,
+  //       author: JSON.parse(authorId),
+  //       question: JSON.parse(questionId),
+  //       path: pathname,
+  //     });
+
+  //     form.reset();
+  //     if (editorRef.current) {
+  //       const editor = editorRef.current as any;
+  //       editor.setContent('');
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   const generateAIAnswer = async () => {
     if (!authorId) {
@@ -96,6 +166,11 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 
   return (
     <>
+      <CheckRelevanceDialog
+        isOpen={isDialogOpen}
+        onCancel={handleDialogCancel}
+        onContinue={handleDialogContinue}
+      />
       <div className="flex flex-col justify-between gap-5 mt-6 sm:flex-row sm:gap-2 sm:items-center">
         <h4 className="paragraph-semibold text-dark400_light800">
           Write your answer here

@@ -40,6 +40,10 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
     explanation: string;
     tags: string[];
   } | null>(null);
+  const [changes, setChanges] = useState<{
+    title: string[];
+    explanation: string[];
+  } | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -122,6 +126,8 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
       if (data.corrected && data.corrected !== `${title}\n${explanation}`) {
         setOriginalContent({ title, explanation, tags });
         setCorrections(data.corrected);
+        setChanges(data.changes);
+
         setIsDialogOpen(true); // Open the dialog
       } else {
         // No corrections, submit directly
@@ -314,12 +320,18 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
         onClose={() => setIsDialogOpen(false)}
         onSubmit={(correctedContent) => {
           if (originalContent) {
-            onSubmit(correctedContent);
+            form.setValue('title', correctedContent.title);
+            onSubmit(correctedContent.content);
           }
           setIsDialogOpen(false);
         }}
         originalContent={originalContent}
-        correctedContent={corrections}
+        correctedContent={
+          corrections && typeof corrections === 'string'
+            ? JSON.parse(corrections)
+            : corrections
+        }
+        changes={changes}
       />
     </Form>
   );
