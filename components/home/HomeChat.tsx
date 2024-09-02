@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import Image from 'next/image';
 import { Input } from '../ui/input';
 import ReactHtmlParser from 'html-react-parser';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 
 const HomeChat = () => {
   const [question, setQuestion] = useState('');
@@ -14,10 +14,9 @@ const HomeChat = () => {
   const [similarQuestion, setSimilarQuestion] = useState<null | {
     id: string;
     title: string;
-    answers: string;
+    answer: string;
   }>(null);
 
-  const { signOut } = useAuth();
   const { user } = useUser();
 
   //   Load history from localStorage
@@ -52,13 +51,15 @@ const HomeChat = () => {
       const data = await response.json();
 
       if (data.similarQuestion && !forceNewAnswer) {
+        // Set the similar question state
         setSimilarQuestion(data.similarQuestion);
       } else {
+        // Set the answer and update the history
         setAnswer(data.reply);
         const temp = [...history, data.reply];
         setHistory(temp);
         setQuestion('');
-        setSimilarQuestion(null);
+        setSimilarQuestion(null); // Clear similar question if any
         localStorage.setItem('chatHistory', JSON.stringify(temp));
       }
     } catch (error) {
@@ -103,12 +104,17 @@ const HomeChat = () => {
   return (
     <div className="flex flex-col items-center justify-between min-h-screen">
       {similarQuestion && (
-        <div className="w-full p-4 card-wrapper rounded mb-4">
-          <h2 className="sm:h3-semibold base-semibold text-dark200_light900 mb-2">
-            Similar Question Found in system:
+        <div className="w-full p-6 card-wrapper rounded mb-4 flex-col items-start justify-center gap-8">
+          <h2 className="sm:h3-semibold base-semibold text-center text-dark200_light900 mb-2">
+            Similar Question Found in System:
           </h2>
-          <p className="text-dark200_light900">{similarQuestion.title}</p>
-          <div className="flex gap-4 mt-2">
+          <p className="text-dark200_light900 mt-6">
+            <span className="text-dark100_light900 font-bold">
+              Question Title:
+            </span>{' '}
+            {similarQuestion.title}
+          </p>
+          <div className="flex gap-4 mt-8">
             <Button
               className="w-fit primary-gradient text-light-900"
               onClick={handleAcceptSimilar}
@@ -116,7 +122,7 @@ const HomeChat = () => {
               View Answer
             </Button>
             <Button className="text-primary-500" onClick={handleAskAnyway}>
-              Ask Anyway
+              Ask AI
             </Button>
           </div>
         </div>
@@ -128,7 +134,9 @@ const HomeChat = () => {
               Answer:
             </h2>
             <div className="text-dark200_light900 whitespace-pre-wrap">
-              {ReactHtmlParser(ans)}
+              {typeof ans === 'string'
+                ? ReactHtmlParser(ans)
+                : 'Invalid answer format'}
             </div>
           </div>
         ))}

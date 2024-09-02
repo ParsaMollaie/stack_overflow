@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-
-import { getAllQuestions } from '@/lib/actions/question.action';
-import { getSingleAnswer } from '@/lib/actions/answer.action';
+import { globalSearch } from '@/lib/actions/general.action';
 import { connectToDatabse } from '@/lib/mongoose';
-import { cosineSimilarity } from '@/lib/utils';
+import { getSingleAnswer } from '@/lib/actions/answer.action';
 
 export const POST = async (request: Request) => {
   try {
@@ -19,38 +17,33 @@ export const POST = async (request: Request) => {
     }
 
     await connectToDatabse();
-    const existingQuestions = await getAllQuestions();
 
-    const threshold = 0.8; // Increased threshold
-    const minTokenMatch = 2; // Define minimum token match
+    // Fetch the global search results, focusing only on questions
+    const searchResults = await globalSearch({
+      query: question,
+      type: 'question', // Specify to only search within questions
+    });
 
+    const parsedResults = JSON.parse(searchResults);
     let similarQuestion = null;
 
-    for (const existingQuestion of existingQuestions) {
-      const similarity = cosineSimilarity(question, existingQuestion.title);
-      
-      // Token matching logic
-      const questionTokens = question.toLowerCase().split(' ');
-      const existingTokens = existingQuestion.title.toLowerCase().split(' ');
-      const tokenMatchCount = questionTokens.filter(token => existingTokens.includes(token)).length;
-
-      if (similarity > threshold && tokenMatchCount >= minTokenMatch) {
-        similarQuestion = existingQuestion;
-        break;
-      }
+    // If any question results were found, set the first one as the similar question
+    if (parsedResults.length > 0) {
+      similarQuestion = parsedResults[0];
     }
 
     if (similarQuestion && !forceNewAnswer) {
       return NextResponse.json({
         message: 'A similar question already exists:',
         similarQuestion: {
-          id: similarQuestion._id,
+          id: similarQuestion.id,
           title: similarQuestion.title,
           answer: similarQuestion.answer,
         },
       });
     }
 
+    // Proceed with OpenAI API if no similar question was found
     const openAiPayload = {
       model: 'gpt-3.5-turbo',
       messages: [
@@ -90,6 +83,99 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };
+
+// import { NextResponse } from 'next/server';
+
+// import { getAllQuestions } from '@/lib/actions/question.action';
+// import { getSingleAnswer } from '@/lib/actions/answer.action';
+// import { connectToDatabse } from '@/lib/mongoose';
+// import { cosineSimilarity } from '@/lib/utils';
+
+// export const POST = async (request: Request) => {
+//   try {
+//     const { question, forceNewAnswer, questionId } = await request.json();
+
+//     if (questionId) {
+//       const answer = await getSingleAnswer({ questionId });
+//       return NextResponse.json({ answer });
+//     }
+
+//     if (!question || typeof question !== 'string') {
+//       return NextResponse.json({ error: 'Invalid question format.' }, { status: 400 });
+//     }
+
+//     await connectToDatabse();
+//     const existingQuestions = await getAllQuestions();
+
+//     const threshold = 0.8; // Increased threshold
+//     const minTokenMatch = 2; // Define minimum token match
+
+//     let similarQuestion = null;
+
+//     for (const existingQuestion of existingQuestions) {
+//       const similarity = cosineSimilarity(question, existingQuestion.title);
+      
+//       // Token matching logic
+//       const questionTokens = question.toLowerCase().split(' ');
+//       const existingTokens = existingQuestion.title.toLowerCase().split(' ');
+//       const tokenMatchCount = questionTokens.filter(token => existingTokens.includes(token)).length;
+
+//       if (similarity > threshold && tokenMatchCount >= minTokenMatch) {
+//         similarQuestion = existingQuestion;
+//         break;
+//       }
+//     }
+
+//     if (similarQuestion && !forceNewAnswer) {
+//       return NextResponse.json({
+//         message: 'A similar question already exists:',
+//         similarQuestion: {
+//           id: similarQuestion._id,
+//           title: similarQuestion.title,
+//           answer: similarQuestion.answer,
+//         },
+//       });
+//     }
+
+//     const openAiPayload = {
+//       model: 'gpt-3.5-turbo',
+//       messages: [
+//         {
+//           role: 'system',
+//           content: 'You are a highly skilled coding assistant...',
+//         },
+//         {
+//           role: 'user',
+//           content: `Please help me with this coding question: ${question}`,
+//         },
+//       ],
+//       temperature: 0.6,
+//       max_tokens: 700,
+//     };
+
+//     const response = await fetch('https://api.openai.com/v1/chat/completions', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+//       },
+//       body: JSON.stringify(openAiPayload),
+//     });
+
+//     const responseData = await response.json();
+
+//     if (!response.ok) {
+//       return NextResponse.json({ error: responseData.error.message }, { status: response.status });
+//     }
+
+//     const reply = responseData.choices[0].message.content.trim();
+
+//     return NextResponse.json({ reply });
+//   } catch (error: any) {
+//     console.error('Error during API request:', error);
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+// };
 
 
 // import { NextResponse } from 'next/server';
