@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import GlobalFilters from "./GlobalFilters";
-import { globalSearch } from "@/lib/actions/general.action";
+import { useEffect, useState } from 'react';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import GlobalFilters from './GlobalFilters';
+import { globalSearch } from '@/lib/actions/general.action';
 
 const GlobalResult = () => {
   const searchParams = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState([
-    { type: "question", id: 1, title: "nextjs" },
-    { type: "tag", id: 1, title: "tagq" },
-    { type: "user", id: 1, title: "userq" },
+    { type: 'question', id: 1, title: 'nextjs' },
+    { type: 'tag', id: 1, title: 'tagq' },
+    { type: 'user', id: 1, title: 'userq' },
   ]);
 
-  const global = searchParams.get("global");
-  const type = searchParams.get("type");
+  const global = searchParams.get('global');
+  const type = searchParams.get('type');
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -48,17 +48,17 @@ const GlobalResult = () => {
 
   const renderLink = (type: string, id: string) => {
     switch (type) {
-      case "question":
+      case 'question':
         return `/question/${id}`;
-      case "answer":
+      case 'answer':
         return `/question/${id}`;
-      case "user":
+      case 'user':
         return `/profile/${id}`;
-      case "tag":
+      case 'tag':
         return `/tags/${id}`;
 
       default:
-        return "/";
+        return '/';
     }
   };
 

@@ -21,7 +21,7 @@ export const POST = async (request: Request) => {
     // Fetch the global search results, focusing only on questions
     const searchResults = await globalSearch({
       query: question,
-      type: 'question', // Specify to only search within questions
+      type: 'question', 
     });
 
     const parsedResults = JSON.parse(searchResults);
