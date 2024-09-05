@@ -5,17 +5,17 @@ import Image from 'next/image';
 import { Input } from '../ui/input';
 import ReactHtmlParser from 'html-react-parser';
 import { useUser } from '@clerk/nextjs';
+import { toast } from '../ui/use-toast';
 
 const HomeChat = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
-  const [similarQuestion, setSimilarQuestion] = useState<null | {
+  const [similarQuestions, setSimilarQuestions] = useState<null | Array<{
     id: string;
     title: string;
-    answer: string;
-  }>(null);
+  }>>(null);
 
   const { user } = useUser();
 
@@ -50,16 +50,16 @@ const HomeChat = () => {
 
       const data = await response.json();
 
-      if (data.similarQuestion && !forceNewAnswer) {
-        // Set the similar question state
-        setSimilarQuestion(data.similarQuestion);
+      if (data.similarQuestions && !forceNewAnswer) {
+        // Set the similar questions state
+        setSimilarQuestions(data.similarQuestions);
       } else {
         // Set the answer and update the history
         setAnswer(data.reply);
         const temp = [...history, data.reply];
         setHistory(temp);
         setQuestion('');
-        setSimilarQuestion(null); // Clear similar question if any
+        setSimilarQuestions(null);
         localStorage.setItem('chatHistory', JSON.stringify(temp));
       }
     } catch (error) {
@@ -69,30 +69,39 @@ const HomeChat = () => {
     }
   };
 
-  const handleAcceptSimilar = async () => {
-    if (similarQuestion) {
-      try {
-        const response = await fetch('/api/askQuestion', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ questionId: similarQuestion.id }),
+  const handleAcceptSimilar = async (id: string) => {
+    try {
+      const response = await fetch('/api/askQuestion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ questionId: id }),
+      });
+
+      const data = await response.json();
+
+      if (data.answer && data.answer.content) {
+        setAnswer(data.answer.content);
+        const temp = [...history, data.answer.content];
+        setHistory(temp);
+        setSimilarQuestions(null);
+        setQuestion('');
+        localStorage.setItem('chatHistory', JSON.stringify(temp));
+      } else {
+        return toast({
+          variant: 'destructive',
+          title: 'No Answer',
+          description: 'No answer found for the selected question.',
         });
-
-        const data = await response.json();
-
-        if (data.answer) {
-          setAnswer(data.answer.content);
-          const temp = [...history, data.answer.content];
-          setHistory(temp);
-          setSimilarQuestion(null);
-          setQuestion('');
-          localStorage.setItem('chatHistory', JSON.stringify(temp));
-        }
-      } catch (error) {
-        console.error('Error fetching the existing answer:', error);
       }
+    } catch (error) {
+      console.error('Error fetching the existing answer:', error);
+      return toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An error occurred while fetching the answer.',
+      });
     }
   };
 
@@ -103,28 +112,36 @@ const HomeChat = () => {
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen">
-      {similarQuestion && (
+      {similarQuestions && similarQuestions.length > 0 && (
         <div className="w-full p-6 card-wrapper rounded mb-4 flex-col items-start justify-center gap-8">
           <h2 className="sm:h3-semibold base-semibold text-center text-dark200_light900 mb-2">
-            Similar Question Found in System:
+            Similar Questions Found in System:
           </h2>
-          <p className="text-dark200_light900 mt-6">
-            <span className="text-dark100_light900 font-bold">
-              Question Title:
-            </span>{' '}
-            {similarQuestion.title}
-          </p>
-          <div className="flex gap-4 mt-8">
-            <Button
-              className="w-fit primary-gradient text-light-900"
-              onClick={handleAcceptSimilar}
-            >
-              View Answer
-            </Button>
-            <Button className="text-primary-500" onClick={handleAskAnyway}>
-              Ask AI
-            </Button>
-          </div>
+          <ul className="list-disc mt-8">
+            {similarQuestions.map((q) => (
+              <li key={q.id} className="mt-4">
+                <p className="text-dark200_light900 mt-1">
+                  <span className="text-dark100_light900 font-bold">
+                    Question Title: {''}
+                  </span>
+                  {q.title}
+                </p>
+                <Button
+                  className="w-fit primary-gradient text-light-900 mt-2"
+                  onClick={() => handleAcceptSimilar(q.id)}
+                >
+                  View Answer
+                </Button>
+              </li>
+            ))}
+          </ul>
+          <Button
+            className="text-primary-500 mt-8 dark:border-primary-100 border-primary-500"
+            variant="outline"
+            onClick={handleAskAnyway}
+          >
+            Ask AI Anyway
+          </Button>
         </div>
       )}
       <div className="w-full flex flex-col gap-4 mb-auto overflow-y-auto">

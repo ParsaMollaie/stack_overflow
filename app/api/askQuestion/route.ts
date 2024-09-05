@@ -25,21 +25,14 @@ export const POST = async (request: Request) => {
     });
 
     const parsedResults = JSON.parse(searchResults);
-    let similarQuestion = null;
 
-    // If any question results were found, set the first one as the similar question
-    if (parsedResults.length > 0) {
-      similarQuestion = parsedResults[0];
-    }
-
-    if (similarQuestion && !forceNewAnswer) {
+    if (parsedResults.length > 0 && !forceNewAnswer) {
       return NextResponse.json({
-        message: 'A similar question already exists:',
-        similarQuestion: {
-          id: similarQuestion.id,
-          title: similarQuestion.title,
-          answer: similarQuestion.answer,
-        },
+        message: 'Similar questions found:',
+        similarQuestions: parsedResults.map((result: any) => ({
+          id: result.id,
+          title: result.title,
+        })),
       });
     }
 
