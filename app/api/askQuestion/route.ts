@@ -42,7 +42,10 @@ export const POST = async (request: Request) => {
       messages: [
         {
           role: 'system',
-          content: 'You are a highly skilled coding assistant...',
+          content: `You are an AI assistant for a programming forum. When a user enters a programming-related question, your task is to provide an answer along with a certainty level. The certainty level should be based on your confidence in the accuracy of the answer:
+          - Certainty Level 3: You are absolutely sure about the answer.
+          - Certainty Level 2: You are fairly confident about the answer.
+          - Certainty Level 1: You are not confident about the answer.`
         },
         {
           role: 'user',
@@ -70,7 +73,32 @@ export const POST = async (request: Request) => {
 
     const reply = responseData.choices[0].message.content.trim();
 
-    return NextResponse.json({ reply });
+    const certaintyMatch = reply.match(/Certainty Level:\s*(\d+)/);
+    const answer = reply.replace(/Certainty Level \d:.*?\n?/, '').trim(); 
+
+    const certainty_level = certaintyMatch ? parseInt(certaintyMatch[1], 10) : 3;
+
+
+    const responseMessage: { answer: string; suggestion?: string; suggestionType?: string } = {
+      answer,
+    };
+
+    // Add conditional suggestion based on certainty_level
+    if (certainty_level === 1) {
+    responseMessage.suggestion = 'The AI is not confident. Please ask your question in specific page for more help.';
+    responseMessage.suggestionType = 'button';  // Suggest visiting the ask-question page via a button
+  } else if (certainty_level === 2) {
+    responseMessage.suggestion = 'The AI is fairly confident. You may want ask your question in specific page for more help.';
+    responseMessage.suggestionType = 'link';  // Suggest visiting the ask-question page via a link
+  } else {
+    responseMessage.suggestion = ''; 
+    responseMessage.suggestionType = ''; 
+  }
+
+
+    // console.log("reply:", reply)
+
+    return NextResponse.json( responseMessage );
   } catch (error: any) {
     console.error('Error during API request:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -6,10 +6,18 @@ import { Input } from '../ui/input';
 import ReactHtmlParser from 'html-react-parser';
 import { useUser } from '@clerk/nextjs';
 import { toast } from '../ui/use-toast';
+import { CiWarning } from 'react-icons/ci';
+import { MdErrorOutline } from 'react-icons/md';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const HomeChat = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [suggestionType, setSuggestionType] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const [similarQuestions, setSimilarQuestions] = useState<null | Array<{
@@ -18,6 +26,7 @@ const HomeChat = () => {
   }>>(null);
 
   const { user } = useUser();
+  const router = useRouter();
 
   //   Load history from localStorage
   useEffect(() => {
@@ -54,9 +63,11 @@ const HomeChat = () => {
         // Set the similar questions state
         setSimilarQuestions(data.similarQuestions);
       } else {
-        // Set the answer and update the history
-        setAnswer(data.reply);
-        const temp = [...history, data.reply];
+        setAnswer(data.answer);
+        setSuggestion(data.suggestion || null);
+        setSuggestionType(data.suggestionType || null);
+
+        const temp = [...history, data.answer];
         setHistory(temp);
         setQuestion('');
         setSimilarQuestions(null);
@@ -155,6 +166,30 @@ const HomeChat = () => {
                 ? ReactHtmlParser(ans)
                 : 'Invalid answer format'}
             </div>
+            {suggestion && suggestionType === 'button' && (
+              <div className="flex items-center justify-start gap-2 mt-8">
+                <MdErrorOutline size={20} className="dark:text-red-500" />
+                <Button
+                  className="text-primary-500 mt-8 dark:border-primary-100 border-primary-500"
+                  variant="outline"
+                  onClick={() => router.push('/ask-question')}
+                >
+                  Ask the community
+                </Button>
+              </div>
+            )}
+            {suggestion && suggestionType === 'link' && (
+              <div className="flex items-center justify-start gap-2 mt-8">
+                <CiWarning size={20} className="dark:text-primary-500" />
+                <span className="text-dark200_light900"> {suggestion}</span>
+                <Link
+                  href="/ask-question"
+                  className="text-primary-500 underline"
+                >
+                  Ask Here
+                </Link>
+              </div>
+            )}
           </div>
         ))}
       </div>
