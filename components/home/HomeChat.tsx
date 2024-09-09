@@ -12,38 +12,40 @@ import { MdErrorOutline } from 'react-icons/md';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+type Chat = {
+  answer: string;
+  suggestion: string;
+  suggestionType: string;
+};
+
 const HomeChat = () => {
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [suggestion, setSuggestion] = useState<string | null>(null);
-  const [suggestionType, setSuggestionType] = useState<string | null>(null);
-
   const [isLoading, setIsLoading] = useState(false);
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<Chat[]>([]);
   const [similarQuestions, setSimilarQuestions] = useState<null | Array<{
     id: string;
     title: string;
   }>>(null);
 
-  const { user } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
 
   //   Load history from localStorage
   useEffect(() => {
-    if (user) {
+    if (isLoaded && isSignedIn) {
       const storedHistory = localStorage.getItem('chatHistory');
       if (storedHistory) {
         setHistory(JSON.parse(storedHistory));
       }
     }
-  }, [user]);
+  }, [isSignedIn, isLoaded]);
 
   // Clear localStorage on logout
   useEffect(() => {
-    if (!user) {
+    if (isLoaded && !isSignedIn) {
       localStorage.removeItem('chatHistory');
     }
-  }, [user]);
+  }, [isSignedIn, isLoaded]);
 
   const handleSubmit = async (forceNewAnswer = false) => {
     setIsLoading(true);
@@ -63,11 +65,12 @@ const HomeChat = () => {
         // Set the similar questions state
         setSimilarQuestions(data.similarQuestions);
       } else {
-        setAnswer(data.answer);
-        setSuggestion(data.suggestion || null);
-        setSuggestionType(data.suggestionType || null);
-
-        const temp = [...history, data.answer];
+        const sample = {
+          answer: data.answer,
+          suggestion: data.suggestion,
+          suggestionType: data.suggestionType,
+        };
+        const temp = [...history, sample];
         setHistory(temp);
         setQuestion('');
         setSimilarQuestions(null);
@@ -93,8 +96,10 @@ const HomeChat = () => {
       const data = await response.json();
 
       if (data.answer && data.answer.content) {
-        setAnswer(data.answer.content);
-        const temp = [...history, data.answer.content];
+        const temp = [
+          ...history,
+          { answer: data.answer.content, suggestion: '', suggestionType: '' },
+        ];
         setHistory(temp);
         setSimilarQuestions(null);
         setQuestion('');
@@ -156,19 +161,22 @@ const HomeChat = () => {
         </div>
       )}
       <div className="w-full flex flex-col gap-4 mb-auto overflow-y-auto">
-        {history.map((ans, idx) => (
+        {history.map((chat, idx) => (
           <div key={idx} className="p-4 card-wrapper rounded mb-2">
             <h2 className="sm:h3-semibold base-semibold text-dark200_light900 mb-2">
               Answer:
             </h2>
             <div className="text-dark200_light900 whitespace-pre-wrap">
-              {typeof ans === 'string'
-                ? ReactHtmlParser(ans)
+              {typeof chat.answer === 'string'
+                ? ReactHtmlParser(chat.answer)
                 : 'Invalid answer format'}
             </div>
-            {suggestion && suggestionType === 'button' && (
-              <div className="flex items-center justify-start gap-2 mt-8">
-                <MdErrorOutline size={20} className="dark:text-red-500" />
+            {chat.suggestionType === 'button' && (
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
+                <MdErrorOutline
+                  size={20}
+                  className="dark:text-red-500 max-md:hidden"
+                />
                 <Button
                   className="text-primary-500 mt-8 dark:border-primary-100 border-primary-500"
                   variant="outline"
@@ -178,10 +186,16 @@ const HomeChat = () => {
                 </Button>
               </div>
             )}
-            {suggestion && suggestionType === 'link' && (
-              <div className="flex items-center justify-start gap-2 mt-8">
-                <CiWarning size={20} className="dark:text-primary-500" />
-                <span className="text-dark200_light900"> {suggestion}</span>
+            {chat.suggestionType === 'link' && (
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
+                <CiWarning
+                  size={20}
+                  className="dark:text-primary-500 max-md:hidden"
+                />
+                <span className="text-dark200_light900">
+                  {' '}
+                  {chat.suggestion}
+                </span>
                 <Link
                   href="/ask-question"
                   className="text-primary-500 underline"
