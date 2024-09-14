@@ -39,22 +39,25 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
   };
 
   const highlightChanges = (text: string, wordsToHighlight: string[]) => {
-    let highlightedText = text;
-    wordsToHighlight.forEach((word) => {
-      const escapedWord = escapeRegExp(word);
-      const regex = new RegExp(`(${escapedWord})`, 'gi');
-      highlightedText = highlightedText.replace(
-        regex,
-        '<span class="underline-error">$1</span>'
-      );
-    });
-    // Ensure ReactHtmlParser processes the HTML string safely
-    return ReactHtmlParser(highlightedText);
+    const escapedWords = wordsToHighlight.map((word) => escapeRegExp(word));
+    const regex = new RegExp(`(${escapedWords.join('|')})`, 'gi');
+
+    const parts = text.split(regex);
+
+    return parts.map((part, index) =>
+      escapedWords.includes(part.toLowerCase()) ? (
+        <span key={index} className="underline-error">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
   };
 
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent className="card-wrapper">
+      <AlertDialogContent className="card-wrapper max-w-3xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-dark200_light900">
             AI Suggested Corrections
@@ -64,6 +67,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
             review them below:
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <div className="mt-4">
           <h4 className="text-dark200_light900">Original Title:</h4>
           <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
@@ -72,22 +76,31 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
               changes?.title || []
             )}
           </pre>
+
           <h4 className="mt-4 text-dark200_light900">Corrected Title:</h4>
           <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
             {ReactHtmlParser(correctedContent?.title || '')}
           </pre>
+
           <h4 className="mt-4 text-dark200_light900">Original Content:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
-            {highlightChanges(
-              originalContent?.explanation || '',
-              changes?.explanation || []
-            )}
-          </pre>
+          {/* Add static height and scrollbar for long content */}
+          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded">
+            <pre className="whitespace-pre-wrap">
+              {highlightChanges(
+                originalContent?.explanation || '',
+                changes?.explanation || []
+              )}
+            </pre>
+          </div>
+
           <h4 className="mt-4 text-dark200_light900">Corrected Content:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
-            {ReactHtmlParser(correctedContent?.content || '')}
-          </pre>
+          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded">
+            <pre className="whitespace-pre-wrap">
+              {ReactHtmlParser(correctedContent?.content || '')}
+            </pre>
+          </div>
         </div>
+
         <AlertDialogFooter>
           <Button
             onClick={onClose}
@@ -97,12 +110,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              if (correctedContent) {
-                onSubmit(correctedContent);
-              }
-              onClose();
-            }}
+            onClick={() => correctedContent && onSubmit(correctedContent)}
             className="bg-primary-500 text-dark200_light900"
           >
             Use Corrected Version

@@ -1,13 +1,15 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
-import Image from 'next/image';
 import { Input } from '../ui/input';
 import ReactHtmlParser from 'html-react-parser';
 import { useUser } from '@clerk/nextjs';
 import { toast } from '../ui/use-toast';
 import { CiWarning } from 'react-icons/ci';
 import { MdErrorOutline } from 'react-icons/md';
+import { GiArtificialIntelligence } from 'react-icons/gi';
+import { AiOutlineWechat } from 'react-icons/ai';
+import clsx from 'clsx';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -26,6 +28,7 @@ const HomeChat = () => {
     id: string;
     title: string;
   }>>(null);
+  const [clearingHistory, setClearingHistory] = useState(false);
 
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
@@ -47,6 +50,21 @@ const HomeChat = () => {
     }
   }, [isSignedIn, isLoaded]);
 
+  const handleNewChat = () => {
+    if (history.length > 0) {
+      setClearingHistory(true);
+
+      setTimeout(() => {
+        setHistory([]);
+        localStorage.removeItem('chatHistory');
+        setClearingHistory(false);
+        toast({
+          title: 'Chat reset',
+          description: 'Previous chat history cleared.',
+        });
+      }, 500);
+    }
+  };
   const handleSubmit = async (forceNewAnswer = false) => {
     setIsLoading(true);
 
@@ -208,7 +226,7 @@ const HomeChat = () => {
         ))}
       </div>
       <form
-        className="w-full"
+        className="w-full flex flex-row items-center gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
@@ -232,15 +250,30 @@ const HomeChat = () => {
             {isLoading ? (
               <span>Loading...</span>
             ) : (
-              <Image
-                src="/assets/icons/star.svg"
-                width={25}
-                height={25}
-                alt="generate"
+              <GiArtificialIntelligence
+                size={25}
                 className="cursor-pointer"
+                title="Start Chat"
               />
             )}
           </Button>
+        </div>
+        <div className="p-2 md:p-3 rounded-full bg-primary-500">
+          <AiOutlineWechat
+            size={25}
+            className={clsx(
+              'cursor-pointer',
+              history.length === 0
+                ? 'text-gray-200 cursor-not-allowed opacity-50'
+                : 'text-white'
+            )}
+            onClick={() => {
+              if (history.length > 0) {
+                handleNewChat();
+              }
+            }}
+            title="New Chat"
+          />
         </div>
       </form>
     </div>
