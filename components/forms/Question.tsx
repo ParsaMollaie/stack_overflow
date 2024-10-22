@@ -325,6 +325,13 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
           }
           setIsDialogOpen(false);
         }}
+        onUseMyVersion={() => {
+          // Directly submit the original content
+          if (originalContent) {
+            onSubmit(originalContent.explanation);
+          }
+          setIsDialogOpen(false);
+        }}
         originalContent={originalContent}
         correctedContent={
           corrections && typeof corrections === 'string'

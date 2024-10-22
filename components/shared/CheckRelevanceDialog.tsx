@@ -1,15 +1,13 @@
 import React from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '../ui/button';
 
 interface CheckRelevanceDialogProps {
   isOpen: boolean;
@@ -29,24 +27,25 @@ const CheckRelevanceDialog = ({
           <AlertDialogTitle className="text-dark400_light800 text-center font-semibold md:text-xl">
             Irrelevant Answer Detected
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-dark200_light900 md:text-lg">
+          <AlertDialogDescription className="text-dark200_light900 md:text-lg text-center py-3">
             Your answer seems irrelevant to the question. Do you want to post it
             anyway?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
+          <Button
             onClick={onCancel}
-            className="text-dark200_light900"
-          >
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onContinue}
             className="text-dark200_light900 bg-primary-500"
           >
+            Cancel
+          </Button>
+          <Button
+            onClick={onContinue}
+            variant="outline"
+            className="text-dark200_light900 "
+          >
             Continue
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

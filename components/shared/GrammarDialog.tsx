@@ -14,6 +14,7 @@ interface AlertDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (correctedContent: { title: string; content: string }) => void;
+  onUseMyVersion: () => void;
   originalContent: {
     title: string;
     explanation: string;
@@ -30,6 +31,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
   open,
   onClose,
   onSubmit,
+  onUseMyVersion,
   originalContent,
   correctedContent,
   changes,
@@ -57,7 +59,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent className="card-wrapper max-w-3xl">
+      <AlertDialogContent className="card-wrapper max-w-3xl w-full">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-dark200_light900">
             AI Suggested Corrections
@@ -70,7 +72,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
 
         <div className="mt-4">
           <h4 className="text-dark200_light900">Original Title:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
+          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
             {highlightChanges(
               originalContent?.title || '',
               changes?.title || []
@@ -78,40 +80,51 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
           </pre>
 
           <h4 className="mt-4 text-dark200_light900">Corrected Title:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
+          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
             {ReactHtmlParser(correctedContent?.title || '')}
           </pre>
 
           <h4 className="mt-4 text-dark200_light900">Original Content:</h4>
           {/* Add static height and scrollbar for long content */}
-          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded">
+          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
             <pre className="whitespace-pre-wrap">
               {highlightChanges(
-                originalContent?.explanation || '',
-                changes?.explanation || []
+                originalContent?.title || '',
+                changes?.title || []
               )}
             </pre>
           </div>
 
           <h4 className="mt-4 text-dark200_light900">Corrected Content:</h4>
-          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded">
+          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
             <pre className="whitespace-pre-wrap">
               {ReactHtmlParser(correctedContent?.content || '')}
             </pre>
           </div>
         </div>
 
-        <AlertDialogFooter>
+        <AlertDialogFooter className="mt-3">
+          {/* Cancel Button */}
           <Button
             onClick={onClose}
-            variant="outline"
-            className="text-dark200_light900"
+            className="text-dark200_light900 bg-primary-500"
           >
             Cancel
           </Button>
+
+          {/* Use My Version Button */}
+          <Button
+            onClick={onUseMyVersion}
+            className="bg-gray-500 text-dark200_light900"
+          >
+            Use My Version
+          </Button>
+
+          {/* Use Corrected Version Button */}
           <Button
             onClick={() => correctedContent && onSubmit(correctedContent)}
-            className="bg-primary-500 text-dark200_light900"
+            variant="outline"
+            className=" text-dark200_light900"
           >
             Use Corrected Version
           </Button>

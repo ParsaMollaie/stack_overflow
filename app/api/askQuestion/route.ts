@@ -27,7 +27,7 @@ export const POST = async (request: Request) => {
       type: 'question',
     });
 
-    const parsedResults = JSON.parse(searchResults);
+    const parsedResults = JSON.parse(searchResults).slice(0, 5);
 
     if (parsedResults.length > 0 && !forceNewAnswer) {
       return NextResponse.json({
@@ -101,11 +101,12 @@ export const POST = async (request: Request) => {
       responseMessage.suggestionType = 'button';
     } else if (certainty_level === 2) {
       responseMessage.suggestion =
-        'The AI is fairly confident. You may want ask your question in specific page for more help.';
+        'The AI is fairly confident. You may want to ask your question in specific page for more help.';
       responseMessage.suggestionType = 'link';
-    } else {
-      responseMessage.suggestion = '';
-      responseMessage.suggestionType = '';
+    } else if (certainty_level === 3) {
+      responseMessage.suggestion =
+        'The AI is confident about the answer, but you can ask the community for more insights.';
+      responseMessage.suggestionType = 'link';
     }
 
     return NextResponse.json(responseMessage);

@@ -13,6 +13,9 @@ import clsx from 'clsx';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import NoResult from '../shared/NoResult';
+import StartChat from '../shared/StartChat';
 
 type Chat = {
   answer: string;
@@ -145,7 +148,7 @@ const HomeChat = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen">
+    <div className="flex flex-col items-center justify-between min-h-[83dvh]">
       {similarQuestions && similarQuestions.length > 0 && (
         <div className="w-full p-6 card-wrapper rounded mb-4 flex-col items-start justify-center gap-8">
           <h2 className="sm:h3-semibold base-semibold text-center text-dark200_light900 mb-2">
@@ -179,51 +182,57 @@ const HomeChat = () => {
         </div>
       )}
       <div className="w-full flex flex-col gap-4 mb-auto overflow-y-auto">
-        {history.map((chat, idx) => (
-          <div key={idx} className="p-4 card-wrapper rounded mb-2">
-            <h2 className="sm:h3-semibold base-semibold text-dark200_light900 mb-2">
-              Answer:
-            </h2>
-            <div className="text-dark200_light900 whitespace-pre-wrap">
-              {typeof chat.answer === 'string'
-                ? ReactHtmlParser(chat.answer)
-                : 'Invalid answer format'}
+        {history.length === 0 ? (
+          <StartChat
+            title="Ask your programming related questions"
+            description="Get answers with AI assistance!"
+          />
+        ) : (
+          history.map((chat, idx) => (
+            <div key={idx} className="p-4 card-wrapper rounded mb-2">
+              <h2 className="sm:h3-semibold base-semibold text-dark200_light900 mb-2">
+                Answer:
+              </h2>
+              <div className="text-dark200_light900 whitespace-pre-wrap">
+                {typeof chat.answer === 'string'
+                  ? ReactHtmlParser(chat.answer)
+                  : 'Invalid answer format'}
+              </div>
+              {chat.suggestionType === 'button' && (
+                <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
+                  <MdErrorOutline
+                    size={20}
+                    className="dark:text-red-500 max-md:hidden"
+                  />
+                  <Button
+                    className="text-primary-500 mt-8 dark:border-primary-100 border-primary-500"
+                    variant="outline"
+                    onClick={() => router.push('/ask-question')}
+                  >
+                    Ask the community
+                  </Button>
+                </div>
+              )}
+              {chat.suggestionType === 'link' && (
+                <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
+                  <CiWarning
+                    size={20}
+                    className="dark:text-primary-500 max-md:hidden"
+                  />
+                  <span className="text-dark200_light900">
+                    {chat.suggestion}
+                  </span>
+                  <Link
+                    href="/ask-question"
+                    className="text-primary-500 underline"
+                  >
+                    Ask Here
+                  </Link>
+                </div>
+              )}
             </div>
-            {chat.suggestionType === 'button' && (
-              <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
-                <MdErrorOutline
-                  size={20}
-                  className="dark:text-red-500 max-md:hidden"
-                />
-                <Button
-                  className="text-primary-500 mt-8 dark:border-primary-100 border-primary-500"
-                  variant="outline"
-                  onClick={() => router.push('/ask-question')}
-                >
-                  Ask the community
-                </Button>
-              </div>
-            )}
-            {chat.suggestionType === 'link' && (
-              <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
-                <CiWarning
-                  size={20}
-                  className="dark:text-primary-500 max-md:hidden"
-                />
-                <span className="text-dark200_light900">
-                  {' '}
-                  {chat.suggestion}
-                </span>
-                <Link
-                  href="/ask-question"
-                  className="text-primary-500 underline"
-                >
-                  Ask Here
-                </Link>
-              </div>
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
       <form
         className="w-full flex flex-row items-center gap-3"
