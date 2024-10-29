@@ -88,10 +88,11 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
           {/* Add static height and scrollbar for long content */}
           <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
             <pre className="whitespace-pre-wrap">
-              {highlightChanges(
-                originalContent?.title || '',
-                changes?.title || []
-              )}
+              {/* {highlightChanges(
+                originalContent?.explanation || '',
+                changes?.explanation || []
+              )} */}
+              {ReactHtmlParser(originalContent?.explanation || '')}
             </pre>
           </div>
 
