@@ -1,20 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  headers: {
-    source: '/api/(.*)',
-  },
   headers: [
     {
-      key: 'Access-Control-Allow-Origin',
-      value: 'https://dev-flow-sable.vercel.app',
-    },
-    {
-      key: 'Access-Control-Allow-Methods',
-      value: 'GET, POST, OPTIONS',
-    },
-    {
-      key: 'Access-Control-Allow-Headers',
-      value: 'Content-Type',
+      source: '/api/(.*)',
+      headers: [
+        {
+          key: 'Access-Control-Allow-Origin',
+          value: '*',
+        },
+        {
+          key: 'Access-Control-Allow-Methods',
+          value: 'GET,POST,OPTIONS',
+        },
+        {
+          key: 'Access-Control-Allow-Headers',
+          value: 'Content-Type,Authorization',
+        },
+      ],
     },
   ],
   experimental: {
