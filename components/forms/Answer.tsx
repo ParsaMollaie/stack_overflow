@@ -109,28 +109,6 @@ const Answer = ({ question, questionId, authorId }: Props) => {
     setPendingSubmission(null);
   };
 
-  // const handleSubmitAnswer = async (values: z.infer<typeof AnswerSchema>) => {
-  //   setIsSubmitting(true);
-  //   try {
-  //     await createAnswer({
-  //       content: values.answer,
-  //       author: JSON.parse(authorId),
-  //       question: JSON.parse(questionId),
-  //       path: pathname,
-  //     });
-
-  //     form.reset();
-  //     if (editorRef.current) {
-  //       const editor = editorRef.current as any;
-  //       editor.setContent('');
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
   const generateAIAnswer = async () => {
     if (!authorId) {
       return toast({
@@ -149,7 +127,7 @@ const Answer = ({ question, questionId, authorId }: Props) => {
         }
       );
       const aiAnswer = await responese.json();
-      console.log(aiAnswer.reply);
+      // console.log(aiAnswer.reply);
       // Convert plain text to HTML format
       const formattedAnswert = aiAnswer.reply.replace(/\n/g, '<br />');
 
