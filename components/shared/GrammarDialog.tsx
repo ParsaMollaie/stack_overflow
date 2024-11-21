@@ -59,73 +59,81 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent className="card-wrapper max-w-3xl w-full">
+      <AlertDialogContent className="w-full max-w-3xl p-4 md:p-6 lg:p-8">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-dark200_light900">
+          <AlertDialogTitle className="text-lg md:text-xl font-semibold text-dark200_light900">
             AI Suggested Corrections
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-dark200_light900">
+          <AlertDialogDescription className="text-sm md:text-base text-dark200_light900">
             The AI has suggested some corrections to your question. Please
             review them below:
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="mt-4">
-          <h4 className="text-dark200_light900">Original Title:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
-            {highlightChanges(
-              originalContent?.title || '',
-              changes?.title || []
-            )}
-          </pre>
-
-          <h4 className="mt-4 text-dark200_light900">Corrected Title:</h4>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
-            {ReactHtmlParser(correctedContent?.title || '')}
-          </pre>
-
-          <h4 className="mt-4 text-dark200_light900">Original Content:</h4>
-          {/* Add static height and scrollbar for long content */}
-          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
-            <pre className="whitespace-pre-wrap">
-              {/* {highlightChanges(
-                originalContent?.explanation || '',
-                changes?.explanation || []
-              )} */}
-              {ReactHtmlParser(originalContent?.explanation || '')}
+        <div className="mt-4 space-y-6">
+          <div>
+            <h4 className="font-medium text-sm md:text-base text-dark200_light900">
+              Original Title:
+            </h4>
+            <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-full overflow-x-auto text-sm">
+              {highlightChanges(
+                originalContent?.title || '',
+                changes?.title || []
+              )}
             </pre>
           </div>
 
-          <h4 className="mt-4 text-dark200_light900">Corrected Content:</h4>
-          <div className="max-h-60 overflow-y-auto bg-gray-100 p-2 rounded max-w-2xl overflow-x-auto">
-            <pre className="whitespace-pre-wrap">
-              {ReactHtmlParser(correctedContent?.content || '')}
+          <div>
+            <h4 className="font-medium text-sm md:text-base text-dark200_light900">
+              Corrected Title:
+            </h4>
+            <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded max-w-full overflow-x-auto text-sm">
+              {ReactHtmlParser(correctedContent?.title || '')}
             </pre>
+          </div>
+
+          <div>
+            <h4 className="font-medium text-sm md:text-base text-dark200_light900">
+              Original Content:
+            </h4>
+            <div className="max-h-48 overflow-y-auto bg-gray-100 p-2 rounded text-sm">
+              <pre className="whitespace-pre-wrap">
+                {ReactHtmlParser(originalContent?.explanation || '')}
+              </pre>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-medium text-sm md:text-base text-dark200_light900">
+              Corrected Content:
+            </h4>
+            <div className="max-h-48 overflow-y-auto bg-gray-100 p-2 rounded text-sm">
+              <pre className="whitespace-pre-wrap">
+                {ReactHtmlParser(correctedContent?.content || '')}
+              </pre>
+            </div>
           </div>
         </div>
 
-        <AlertDialogFooter className="mt-3">
-          {/* Cancel Button */}
+        <AlertDialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
           <Button
             onClick={onClose}
-            className="text-dark200_light900 bg-primary-500"
+            className="w-full sm:w-auto text-dark200_light900 bg-primary-500"
           >
             Cancel
           </Button>
 
-          {/* Use My Version Button */}
           <Button
             onClick={onUseMyVersion}
-            className="bg-gray-500 text-dark200_light900"
+            className="w-full sm:w-auto bg-gray-500 text-dark200_light900"
           >
             Use My Version
           </Button>
 
-          {/* Use Corrected Version Button */}
           <Button
             onClick={() => correctedContent && onSubmit(correctedContent)}
             variant="outline"
-            className=" text-dark200_light900"
+            className="w-full sm:w-auto text-dark200_light900"
           >
             Use Corrected Version
           </Button>
