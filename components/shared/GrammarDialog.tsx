@@ -135,7 +135,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
             variant="outline"
             className="w-full sm:w-auto text-dark200_light900"
           >
-            Use Corrected Version
+            Use AI Version
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
