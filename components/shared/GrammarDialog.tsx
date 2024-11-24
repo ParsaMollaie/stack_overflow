@@ -59,7 +59,7 @@ const GrammarDialog: React.FC<AlertDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
-      <AlertDialogContent className="w-full max-w-3xl p-4 md:p-6 lg:p-8">
+      <AlertDialogContent className="w-full max-w-3xl p-4 md:p-6 lg:p-8 overflow-y-auto max-h-[90vh] sm:max-h-[80vh]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-lg md:text-xl font-semibold text-dark200_light900">
             AI Suggested Corrections
