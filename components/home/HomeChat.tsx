@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import ReactHtmlParser from 'html-react-parser';
 import { useUser } from '@clerk/nextjs';
 import { toast } from '../ui/use-toast';
 import { CiWarning } from 'react-icons/ci';
@@ -13,9 +12,9 @@ import clsx from 'clsx';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import NoResult from '../shared/NoResult';
 import StartChat from '../shared/StartChat';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type Chat = {
   answer: string;
@@ -194,10 +193,46 @@ const HomeChat = () => {
                 Answer:
               </h2>
               <div className="text-dark200_light900 whitespace-pre-wrap">
-                {typeof chat.answer === 'string'
-                  ? ReactHtmlParser(chat.answer)
-                  : 'Invalid answer format'}
+                {typeof chat.answer === 'string' ? (
+                  chat.answer.includes('```') ? (
+                    chat.answer.split(/```/g).map((block, index) => {
+                      if (block.match(/^[a-zA-Z#]+\n/)) {
+                        // Extract language and code
+                        const [lang, ...code] = block.split('\n');
+                        return (
+                          <SyntaxHighlighter
+                            key={index}
+                            language={lang.trim()} // Language extracted dynamically
+                            style={tomorrow}
+                            showLineNumbers
+                          >
+                            {code.join('\n')}
+                          </SyntaxHighlighter>
+                        );
+                      } else if (index % 2 === 1) {
+                        // Default to plaintext if no language is specified
+                        return (
+                          <SyntaxHighlighter
+                            key={index}
+                            language="plaintext"
+                            style={tomorrow}
+                            showLineNumbers
+                          >
+                            {block}
+                          </SyntaxHighlighter>
+                        );
+                      }
+                      // Non-code text
+                      return <p key={index}>{block}</p>;
+                    })
+                  ) : (
+                    <p>{chat.answer}</p>
+                  )
+                ) : (
+                  'Invalid answer format'
+                )}
               </div>
+
               {chat.suggestionType === 'button' && (
                 <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
                   <MdErrorOutline
@@ -215,10 +250,19 @@ const HomeChat = () => {
               )}
               {chat.suggestionType === 'link' && (
                 <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-2 mt-8">
-                  <CiWarning
-                    size={20}
-                    className="dark:text-primary-500 max-md:hidden"
-                  />
+                  {chat.suggestion.includes('fairly confident') ? (
+                    <CiWarning
+                      size={20}
+                      className="dark:text-yellow-500 max-md:hidden"
+                      title="Certainty Level 2"
+                    />
+                  ) : (
+                    <GiArtificialIntelligence
+                      size={20}
+                      className="dark:text-green-500 max-md:hidden"
+                      title="Certainty Level 3"
+                    />
+                  )}
                   <span className="text-dark200_light900">
                     {chat.suggestion}
                   </span>
