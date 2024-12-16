@@ -192,7 +192,7 @@ const HomeChat = () => {
               <h2 className="sm:h3-semibold base-semibold text-dark200_light900 mb-2">
                 Answer:
               </h2>
-              <div className="text-dark200_light900 whitespace-pre-wrap">
+              <div className="text-dark200_light900 whitespace-pre-wrap max-w-[78vw] overflow-x-auto">
                 {typeof chat.answer === 'string' ? (
                   chat.answer.includes('```') ? (
                     chat.answer.split(/```/g).map((block, index) => {
@@ -202,7 +202,7 @@ const HomeChat = () => {
                         return (
                           <SyntaxHighlighter
                             key={index}
-                            language={lang.trim()} // Language extracted dynamically
+                            language={lang.trim()}
                             style={tomorrow}
                             showLineNumbers
                           >
@@ -210,7 +210,6 @@ const HomeChat = () => {
                           </SyntaxHighlighter>
                         );
                       } else if (index % 2 === 1) {
-                        // Default to plaintext if no language is specified
                         return (
                           <SyntaxHighlighter
                             key={index}
